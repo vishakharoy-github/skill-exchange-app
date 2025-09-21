@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "708917613624",
+    "project_id": "project-cf50f",
+    "storage_bucket": "project-cf50f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708917613624:android:12d40453d8872c3a54c2cd",
+        "android_client_info": {
+          "package_name": "com.example.skillexchange"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXtLyPAEcprdLA5Zt97mFOD4i9zbqUTpA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:708917613624:android:6cdbac996f56a0e554c2cd",
+        "android_client_info": {
+          "package_name": "com.example.untitled"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXtLyPAEcprdLA5Zt97mFOD4i9zbqUTpA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
