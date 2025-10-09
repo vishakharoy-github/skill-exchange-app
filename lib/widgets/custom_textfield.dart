@@ -2,30 +2,45 @@ import 'package:flutter/material.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
-  final String labelText;
+  final String hintText;
   final bool obscureText;
-  final TextInputType? keyboardType; // Add keyboardType here
-  final IconData? icon; // Optional icon
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final int? maxLines;
 
   const CustomTextField({
-    super.key,
+    super.key, // Added key parameter here
     required this.controller,
-    required this.labelText,
+    required this.hintText,
     this.obscureText = false,
-    this.keyboardType, // Add this line to accept keyboardType
-    this.icon, // Optional icon parameter
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.maxLines = 1,
   });
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscureText,
-      keyboardType: keyboardType,  // Pass it to the TextField widget
+      keyboardType: keyboardType,
+      validator: validator,
+      maxLines: maxLines,
       decoration: InputDecoration(
-        labelText: labelText,
-        border: const OutlineInputBorder(),
-        prefixIcon: icon != null ? Icon(icon) : null, // Handle icon if passed
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+        filled: true,
+        fillColor: Theme.of(context).inputDecorationTheme.fillColor,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
       ),
     );
   }

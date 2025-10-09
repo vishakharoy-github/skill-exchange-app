@@ -4,13 +4,10 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.2'
-        classpath 'com.google.gms:google-services:4.4.2' // ✅ Correct Maven format (note the ":" instead of ".")
+        classpath("com.android.tools.build:gradle:7.3.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
+        classpath("com.google.gms:google-services:4.4.0")
     }
-}
-
-plugins {
-    id("com.google.gms.google-services") version "4.4.2" apply false // ✅ This is fine
 }
 
 allprojects {

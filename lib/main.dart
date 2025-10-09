@@ -1,31 +1,25 @@
-import 'package:SkillExchange/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'screens/login_screen.dart';
-import 'screens/signup_screen.dart';
-import 'screens/skill_screen.dart';
-import 'screens/interest_screen.dart';
-import 'screens/home_screen.dart';
-
+import 'package:provider/provider.dart';
+import 'package:skill_exchange_app/firebase_options.dart';
+import 'package:skill_exchange_app/screens/splash_screen.dart';
+import 'package:skill_exchange_app/screens/login_screen.dart'; // Add this import
+import 'package:skill_exchange_app/screens/signup_screen.dart'; // Add this import
+import 'package:skill_exchange_app/screens/home_screen.dart'; // Add this import
+import 'package:skill_exchange_app/services/auth_service.dart';
+import 'package:skill_exchange_app/services/user_service.dart';
+import 'package:skill_exchange_app/theme/app_theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    // For Flutter Web, you'll need to pass FirebaseOptions manually
     await Firebase.initializeApp(
-      options: FirebaseOptions(
-        apiKey: 'your-api-key',
-        appId: 'your-app-id',
-        messagingSenderId: 'your-sender-id',
-        projectId: 'your-project-id',
-        storageBucket: 'your-storage-bucket',
-        authDomain: 'your-auth-domain',
-      ),
+      options: DefaultFirebaseOptions.currentPlatform,
     );
-    print("✅ Firebase initialized");
+    debugPrint('✅ Firebase initialized successfully'); // Use debugPrint instead of print
   } catch (e) {
-    print("❌ Firebase init error: $e");
+    debugPrint('❌ Firebase initialization failed: $e'); // Use debugPrint instead of print
   }
 
   runApp(const MyApp());
@@ -36,19 +30,23 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Skill Exchange',
-      theme: customTheme,
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) =>  LoginScreen(),
-        '/signup': (context) => SignupScreen(),
-        '/skills': (context) =>  SkillScreen(),
-        '/interests': (context) => InterestScreen(),
-        '/home': (context) => HomeScreen(),
-      },
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ChangeNotifierProvider(create: (_) => UserService()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Skill Exchange',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        home: const SplashScreen(),
+        routes: {
+          '/login': (context) => const LoginScreen(),
+          '/signup': (context) => const SignupScreen(),
+          '/home': (context) => const HomeScreen(),
+        },
+      ),
     );
   }
 }
-

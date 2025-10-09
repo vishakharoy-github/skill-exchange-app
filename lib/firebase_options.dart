@@ -48,6 +48,7 @@ class DefaultFirebaseOptions {
     authDomain: 'project-cf50f.firebaseapp.com',
     storageBucket: 'project-cf50f.firebasestorage.app',
     measurementId: 'G-NS01JYDTT7',
+    databaseURL: 'https://project-cf50f-default-rtdb.asia-southeast1.firebasedatabase.app', // ADD THIS LINE
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -56,24 +57,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '708917613624',
     projectId: 'project-cf50f',
     storageBucket: 'project-cf50f.firebasestorage.app',
-  );
-
-  static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBW-gnlfmaCoJ1qIHylzQD7pchyRXpOVDQ',
-    appId: '1:708917613624:ios:d8a08d7a3636340c54c2cd',
-    messagingSenderId: '708917613624',
-    projectId: 'project-cf50f',
-    storageBucket: 'project-cf50f.firebasestorage.app',
-    iosBundleId: 'com.example.skillexchange',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBW-gnlfmaCoJ1qIHylzQD7pchyRXpOVDQ',
-    appId: '1:708917613624:ios:d8a08d7a3636340c54c2cd',
-    messagingSenderId: '708917613624',
-    projectId: 'project-cf50f',
-    storageBucket: 'project-cf50f.firebasestorage.app',
-    iosBundleId: 'com.example.skillexchange',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
@@ -85,4 +68,23 @@ class DefaultFirebaseOptions {
     storageBucket: 'project-cf50f.firebasestorage.app',
     measurementId: 'G-KQ2EX6KBHJ',
   );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyBW-gnlfmaCoJ1qIHylzQD7pchyRXpOVDQ',
+    appId: '1:708917613624:ios:d8a08d7a3636340c54c2cd',
+    messagingSenderId: '708917613624',
+    projectId: 'project-cf50f',
+    storageBucket: 'project-cf50f.firebasestorage.app',
+    iosBundleId: 'com.example.skillexchange',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyBW-gnlfmaCoJ1qIHylzQD7pchyRXpOVDQ',
+    appId: '1:708917613624:ios:d8a08d7a3636340c54c2cd',
+    messagingSenderId: '708917613624',
+    projectId: 'project-cf50f',
+    storageBucket: 'project-cf50f.firebasestorage.app',
+    iosBundleId: 'com.example.skillexchange',
+  );
+
 }

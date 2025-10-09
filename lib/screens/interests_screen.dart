@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:skill_exchange_app/widgets/custom_button.dart';
+import 'package:skill_exchange_app/screens/home_screen.dart';
+import 'package:skill_exchange_app/services/user_service.dart';
+import 'package:provider/provider.dart';
 
-class SkillScreen extends StatefulWidget {
-  const SkillScreen({super.key});
+class InterestsScreen extends StatefulWidget {
+  const InterestsScreen({super.key}); // Added key parameter
 
   @override
-  State<SkillScreen> createState() => _SkillScreenState();
+  State<InterestsScreen> createState() => _InterestsScreenState();
 }
 
-class _SkillScreenState extends State<SkillScreen> {
+class _InterestsScreenState extends State<InterestsScreen> {
   final List<String> _allSkills = [
     'Web Development', 'Mobile Development', 'UI/UX Design',
     'Graphic Design', 'Digital Marketing', 'Content Writing',
@@ -19,16 +21,34 @@ class _SkillScreenState extends State<SkillScreen> {
 
   final List<String> _selectedSkills = [];
 
-  void _navigateToNextScreen() {
-    // Add your navigation logic here
-    // Navigator.push(context, MaterialPageRoute(builder: (context) => NextScreen()));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Select Your Skills'),
+        actions: [
+          TextButton(
+            onPressed: _selectedSkills.isNotEmpty
+                ? () {
+              Provider.of<UserService>(context, listen: false)
+                  .updateUserSkills(_selectedSkills);
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()),
+              );
+            }
+                : null,
+            child: Text(
+              'Done',
+              style: TextStyle(
+                color: _selectedSkills.isNotEmpty
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16),
@@ -79,16 +99,9 @@ class _SkillScreenState extends State<SkillScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 20),
-            CustomButton(
-              text: 'Continue',
-              onPressed: _selectedSkills.isNotEmpty ? _navigateToNextScreen : null,
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
   }
 }
-
