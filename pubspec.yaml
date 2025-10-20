@@ -1,0 +1,42 @@
+name: skill_exchange_app
+description: A new Flutter project.
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.7.2 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Firebase - Use Realtime Database instead of Firestore
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.17.2
+  firebase_database: ^10.3.1  # Add this line
+  # cloud_firestore: ^4.13.0  # Remove or comment out this line
+
+  # Other dependencies
+  cupertino_icons: ^1.0.2
+  provider: ^6.0.5
+  google_fonts: ^6.3.2
+  lottie: ^2.7.0
+  intl: ^0.18.1
+  image_picker: ^1.0.4
+  cached_network_image: ^3.3.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/animations/loading_animation.json
+    - assets/animations/splash_animation.json
+    - assets/animations/success_checkmark.json
+    - assets/animations/skill_learning.json
+    - assets/animations/welcome_animation.json
