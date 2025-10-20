@@ -10,7 +10,9 @@ import 'package:skill_exchange_app/widgets/success_animation.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
-  const SignupScreen({super.key});
+  final Function(ThemeMode) changeTheme;
+
+  const SignupScreen({super.key, required this.changeTheme});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
@@ -70,17 +72,20 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
 
     setState(() => _isLoading = true);
 
+    // Store context in a local variable to avoid using BuildContext across async gaps
+    final currentContext = context;
+
     // Show loading dialog
     showDialog(
-      context: context,
+      context: currentContext,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => const AlertDialog(
         content: LoadingIndicator(message: 'Creating your account...'),
       ),
     );
 
     try {
-      final authService = Provider.of<AuthService>(context, listen: false);
+      final authService = Provider.of<AuthService>(currentContext, listen: false);
       await authService.signUpWithEmailAndPassword(
         _emailController.text.trim(),
         _passwordController.text.trim(),
@@ -88,17 +93,17 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
       );
 
       // Close loading dialog
-      Navigator.pop(context);
+      Navigator.pop(currentContext);
 
       // Show success animation
       _showRegistrationSuccess();
 
     } catch (e) {
       // Close loading dialog
-      Navigator.pop(context);
+      Navigator.pop(currentContext);
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(currentContext).showSnackBar(
         SnackBar(content: Text('Signup failed: ${e.toString()}')),
       );
     }
@@ -109,22 +114,25 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
   }
 
   void _showRegistrationSuccess() {
+    if (!mounted) return;
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => const AlertDialog(
         content: SuccessAnimation(message: 'Account Created!'),
       ),
     );
 
     Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
       Navigator.pop(context); // Close success dialog
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => InterestsScreen()),
-        );
-      }
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => InterestsScreen(changeTheme: widget.changeTheme),
+        ),
+      );
     });
   }
 
@@ -305,7 +313,9 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                               onPressed: _isLoading ? null : () {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                                  MaterialPageRoute(
+                                    builder: (context) => LoginScreen(changeTheme: widget.changeTheme), // FIXED: Add changeTheme
+                                  ),
                                 );
                               },
                               child: Text(

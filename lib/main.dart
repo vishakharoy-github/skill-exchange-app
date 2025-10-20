@@ -8,7 +8,7 @@ import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
 import 'services/auth_service.dart';
 import 'services/user_service.dart';
-import 'widgets/loading_indicator.dart'; // ADD THIS IMPORT
+import 'widgets/loading_indicator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,8 +25,22 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  // Track theme mode
+  ThemeMode _themeMode = ThemeMode.system;
+
+  void _changeTheme(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,23 +52,71 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Skill Exchange',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          useMaterial3: true,
-        ),
-        home: const AuthWrapper(),
+        theme: _buildLightTheme(),
+        darkTheme: _buildDarkTheme(),
+        themeMode: _themeMode,
+        home: AuthWrapper(changeTheme: _changeTheme),
         routes: {
-          '/login': (context) => const LoginScreen(),
-          '/signup': (context) => const SignupScreen(),
-          '/home': (context) => const HomeScreen(),
+          '/login': (context) => LoginScreen(changeTheme: _changeTheme),
+          '/signup': (context) => SignupScreen(changeTheme: _changeTheme),
+          '/home': (context) => HomeScreen(changeTheme: _changeTheme),
         },
+        // ADD THIS to preserve navigation state during theme changes
+        navigatorKey: NavigatorKey.navigatorKey,
+      ),
+    );
+  }
+
+  ThemeData _buildLightTheme() {
+    return ThemeData(
+      primarySwatch: Colors.blue,
+      useMaterial3: true,
+      brightness: Brightness.light,
+      colorScheme: ColorScheme.light(
+        primary: Color(0xFFFF6B6B),
+        secondary: Color(0xFF4ECDC4),
+        surface: Color(0xFFFFFFFF),
+        background: Color(0xFFF0F4FF),
+        onBackground: Color(0xFF374151),
+      ),
+      scaffoldBackgroundColor: Color(0xFFF0F4FF),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Color(0xFFFF6B6B),
+        foregroundColor: Colors.white,
+      ),
+    );
+  }
+
+  ThemeData _buildDarkTheme() {
+    return ThemeData(
+      primarySwatch: Colors.blue,
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.dark(
+        primary: Color(0xFF8B5CF6),
+        secondary: Color(0xFF10B981),
+        surface: Color(0xFF1F2937),
+        background: Color(0xFF111827),
+        onBackground: Colors.white,
+      ),
+      scaffoldBackgroundColor: Color(0xFF111827),
+      appBarTheme: AppBarTheme(
+        backgroundColor: Color(0xFF1F2937),
+        foregroundColor: Colors.white,
       ),
     );
   }
 }
 
+// ADD THIS CLASS to manage navigation state
+class NavigatorKey {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+}
+
 class AuthWrapper extends StatelessWidget {
-  const AuthWrapper({super.key});
+  final Function(ThemeMode) changeTheme;
+
+  const AuthWrapper({super.key, required this.changeTheme});
 
   @override
   Widget build(BuildContext context) {
@@ -63,20 +125,17 @@ class AuthWrapper extends StatelessWidget {
     return StreamBuilder<User?>(
       stream: authService.userState,
       builder: (context, snapshot) {
-        // Show loading while checking auth state
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold( // REMOVED const
-            body: LoadingIndicator(message: 'Checking authentication...'), // FIXED: Remove const
+          return Scaffold(
+            body: LoadingIndicator(message: 'Checking authentication...'),
           );
         }
 
-        // If user is logged in, go to home screen
         if (snapshot.hasData && authService.isLoggedIn) {
-          return const HomeScreen();
+          return HomeScreen(changeTheme: changeTheme);
         }
 
-        // If no user, go to login screen
-        return const LoginScreen();
+        return LoginScreen(changeTheme: changeTheme);
       },
     );
   }

@@ -9,7 +9,9 @@ import 'package:provider/provider.dart';
 import 'profile_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final Function(ThemeMode) changeTheme; // ADD THIS
+
+  const HomeScreen({super.key, required this.changeTheme}); // UPDATE THIS
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -21,7 +23,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   bool _isLoading = true;
   String? _errorMessage;
   bool _showSuccessMessage = true;
-  bool _isDarkMode = false;
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
 
@@ -119,54 +120,23 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    widget.changeTheme(isDark ? ThemeMode.light : ThemeMode.dark);
   }
 
-  ThemeData get _theme {
-    return _isDarkMode
-        ? ThemeData.dark().copyWith(
-      primaryColor: const Color(0xFF60A5FA),
-      colorScheme: ColorScheme.dark(
-        primary: const Color(0xFF60A5FA),
-        secondary: const Color(0xFFC084FC),
-      ),
-      cardTheme: CardTheme(
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        color: const Color(0xFF374151),
-      ),
-    )
-        : ThemeData.light().copyWith(
-      primaryColor: const Color(0xFF2563EB),
-      colorScheme: ColorScheme.light(
-        primary: const Color(0xFF2563EB),
-        secondary: const Color(0xFF7C3AED),
-      ),
-      cardTheme: CardTheme(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      ),
-    );
-  }
-
-  Color _getBackgroundColor() {
-    return _isDarkMode ? const Color(0xFF111827) : const Color(0xFFF9FAFB);
-  }
-
-  Color _getTextColor() {
-    return _isDarkMode ? Colors.white : const Color(0xFF374151);
-  }
-
-  Color _getSubtitleColor() {
-    return _isDarkMode ? const Color(0xFFD1D5DB) : const Color(0xFF6B7280);
-  }
+  // REMOVE all these theme methods since we're using the system theme now:
+  // ThemeData get _theme { ... }
+  // Color _getBackgroundColor() { ... }
+  // Color _getTextColor() { ... }
+  // Color _getSubtitleColor() { ... }
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: _getBackgroundColor(),
+      backgroundColor: colorScheme.background,
       appBar: AppBar(
         title: FadeTransition(
           opacity: _fadeAnimation,
@@ -184,34 +154,34 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
-                  color: _getTextColor(),
+                  color: colorScheme.onBackground,
                 ),
               ),
             ],
           ),
         ),
-        backgroundColor: _isDarkMode ? const Color(0xFF1F2937) : Colors.white,
+        backgroundColor: colorScheme.surface,
         elevation: 8,
-        shadowColor: _isDarkMode ? Colors.black54 : const Color(0x1A000000),
+        shadowColor: isDarkMode ? Colors.black54 : const Color(0x1A000000),
         actions: [
           IconButton(
             icon: Icon(
               Icons.search_rounded,
-              color: _isDarkMode ? Colors.white : const Color(0xFF374151),
+              color: colorScheme.onSurface,
             ),
             onPressed: () {},
           ),
           IconButton(
             icon: Icon(
               Icons.notifications_rounded,
-              color: _isDarkMode ? Colors.white : const Color(0xFF374151),
+              color: colorScheme.onSurface,
             ),
             onPressed: () {},
           ),
           IconButton(
             icon: Icon(
-              _isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-              color: _isDarkMode ? Colors.amber : const Color(0xFF374151),
+              isDarkMode ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+              color: isDarkMode ? Colors.amber : colorScheme.onSurface,
             ),
             onPressed: _toggleTheme,
           ),
@@ -219,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             IconButton(
               icon: Icon(
                 Icons.refresh_rounded,
-                color: _isDarkMode ? Colors.white : const Color(0xFF374151),
+                color: colorScheme.onSurface,
               ),
               onPressed: _refreshData,
             ),
@@ -235,13 +205,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       bottomNavigationBar: _buildBottomNavigationBar(),
       floatingActionButton: FloatingActionButton(
         onPressed: _refreshData,
-        backgroundColor: _isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-        child: const Icon(Icons.refresh_rounded, color: Colors.white),
+        backgroundColor: colorScheme.primary,
+        child: Icon(Icons.refresh_rounded, color: colorScheme.onPrimary),
       ),
     );
   }
 
   Widget _buildMainContent() {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return _isLoading
         ? const LoadingIndicator(message: 'Loading users...')
         : _errorMessage != null
@@ -257,17 +229,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           const SizedBox(height: 20),
           Text(
             _errorMessage!,
-            style: TextStyle(color: _getSubtitleColor(), fontSize: 16),
+            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
           ElevatedButton(
             onPressed: _refreshData,
             style: ElevatedButton.styleFrom(
-              backgroundColor: _isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
+              backgroundColor: colorScheme.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: const Text('Try Again', style: TextStyle(color: Colors.white)),
+            child: Text('Try Again', style: TextStyle(color: colorScheme.onPrimary)),
           ),
         ],
       ),
@@ -330,12 +302,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   BottomNavigationBar _buildBottomNavigationBar() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return BottomNavigationBar(
       currentIndex: _currentIndex,
       onTap: (index) => setState(() => _currentIndex = index),
-      backgroundColor: _isDarkMode ? const Color(0xFF1F2937) : Colors.white,
-      selectedItemColor: _isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB),
-      unselectedItemColor: _isDarkMode ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+      backgroundColor: colorScheme.surface,
+      selectedItemColor: colorScheme.primary,
+      unselectedItemColor: colorScheme.onSurfaceVariant,
       elevation: 8,
       items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
@@ -349,6 +324,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   List<Widget> _buildTabs() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return [
       SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -365,7 +343,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: _isDarkMode
+                      colors: isDarkMode
                           ? [const Color(0xFF1E40AF), const Color(0xFF6B21A8)]
                           : [const Color(0xFFDBEAFE), const Color(0xFFF3E8FF)],
                       begin: Alignment.topLeft,
@@ -381,7 +359,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: _isDarkMode ? Colors.white : const Color(0xFF1E40AF),
+                          color: isDarkMode ? Colors.white : const Color(0xFF1E40AF),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -389,7 +367,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         'Discover new skills and connect with amazing people',
                         style: TextStyle(
                           fontSize: 16,
-                          color: _isDarkMode ? const Color(0xFFB0BEC5) : const Color(0xFF6B7280),
+                          color: isDarkMode ? const Color(0xFFB0BEC5) : const Color(0xFF6B7280),
                         ),
                       ),
                     ],
@@ -401,8 +379,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('🔥 Available Skills', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _getTextColor())),
-                Text('See All', style: TextStyle(color: _isDarkMode ? const Color(0xFF60A5FA) : const Color(0xFF2563EB), fontWeight: FontWeight.w600)),
+                Text('🔥 Available Skills',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colorScheme.onBackground)),
+                Text('See All',
+                    style: TextStyle(color: colorScheme.primary, fontWeight: FontWeight.w600)),
               ],
             ),
             const SizedBox(height: 16),
@@ -431,8 +411,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('👥 People Near You', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: _getTextColor())),
-                Text('${_users.length} users', style: TextStyle(color: _getSubtitleColor(), fontSize: 14)),
+                Text('👥 People Near You',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: colorScheme.onBackground)),
+                Text('${_users.length} users',
+                    style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 14)),
               ],
             ),
             const SizedBox(height: 16),
@@ -447,7 +429,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   children: [
                     Lottie.asset('assets/animations/welcome_animation.json', width: 120, height: 120),
                     const SizedBox(height: 16),
-                    Text('No users found nearby', style: TextStyle(color: _getSubtitleColor(), fontSize: 16)),
+                    Text('No users found nearby',
+                        style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 16)),
                   ],
                 ),
               ),
@@ -460,13 +443,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           children: [
             Lottie.asset('assets/animations/loading_animation.json', width: 150, height: 150),
             const SizedBox(height: 20),
-            Text('Messages Coming Soon!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: _getTextColor())),
+            Text('Messages Coming Soon!',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: colorScheme.onBackground)),
             const SizedBox(height: 10),
-            Text('We\'re working on something amazing', style: TextStyle(color: _getSubtitleColor())),
+            Text('We\'re working on something amazing',
+                style: TextStyle(color: colorScheme.onSurfaceVariant)),
           ],
         ),
       ),
-      const ProfileScreen(),
+      const ProfileScreen(), // This will now properly detect the theme
     ];
   }
 }

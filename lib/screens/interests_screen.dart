@@ -4,7 +4,9 @@ import 'package:skill_exchange_app/services/user_service.dart';
 import 'package:provider/provider.dart';
 
 class InterestsScreen extends StatefulWidget {
-  const InterestsScreen({super.key});
+  final Function(ThemeMode) changeTheme; // ADD THIS
+
+  const InterestsScreen({super.key, required this.changeTheme}); // UPDATE THIS
 
   @override
   State<InterestsScreen> createState() => _InterestsScreenState();
@@ -34,7 +36,9 @@ class _InterestsScreenState extends State<InterestsScreen> {
                   .updateUserSkills(_selectedSkills);
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()),
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(changeTheme: widget.changeTheme), // UPDATE THIS
+                ),
               );
             }
                 : null,
@@ -93,7 +97,7 @@ class _InterestsScreenState extends State<InterestsScreen> {
                     selectedColor: Theme.of(context).primaryColor,
                     checkmarkColor: Colors.white,
                     labelStyle: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
+                      color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
                     ),
                   );
                 },

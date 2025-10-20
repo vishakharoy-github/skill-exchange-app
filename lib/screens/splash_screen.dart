@@ -3,7 +3,9 @@ import 'package:lottie/lottie.dart';
 import 'package:skill_exchange_app/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+  final Function(ThemeMode) changeTheme; // ADD THIS
+
+  const SplashScreen({super.key, required this.changeTheme}); // UPDATE THIS
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -13,12 +15,19 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    // Store context in local variable to avoid async gap issues
+    final currentContext = context;
+
     // Direct navigation after a short delay
     Future.delayed(const Duration(seconds: 3), () {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
-      );
+      if (mounted) {
+        Navigator.pushReplacement(
+          currentContext,
+          MaterialPageRoute(
+            builder: (context) => LoginScreen(changeTheme: widget.changeTheme), // FIXED: Add changeTheme
+          ),
+        );
+      }
     });
   }
 
