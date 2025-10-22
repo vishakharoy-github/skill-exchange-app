@@ -26,6 +26,8 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return TextFormField(
       controller: controller,
       obscureText: obscureText,
@@ -33,25 +35,42 @@ class CustomTextField extends StatelessWidget {
       maxLines: maxLines,
       validator: validator,
       onFieldSubmitted: onSubmitted,
+      style: TextStyle(
+        color: isDarkMode ? Colors.white : Colors.black,
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         hintText: hintText,
+        hintStyle: TextStyle(
+          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+          ),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Colors.grey.shade300),
+          borderSide: BorderSide(
+            color: isDarkMode ? Colors.grey.shade700 : Colors.grey.shade300,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+          borderSide: BorderSide(
+              color: Theme.of(context).primaryColor,
+              width: 2
+          ),
         ),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: isDarkMode ? Colors.grey.shade900 : Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         prefixIcon: prefixIcon != null
-            ? Icon(prefixIcon, color: Colors.grey.shade600)
+            ? Icon(
+          prefixIcon,
+          color: isDarkMode ? Colors.grey.shade400 : Colors.grey.shade600,
+        )
             : null,
         suffixIcon: suffixIcon,
       ),
