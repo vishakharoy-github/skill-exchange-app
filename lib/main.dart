@@ -1,3 +1,4 @@
+// main.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,9 +7,12 @@ import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/skill_screen.dart'; // ADD THIS IMPORT
+import 'screens/interests_screen.dart'; // ADD THIS IMPORT
 import 'services/auth_service.dart';
 import 'services/user_service.dart';
 import 'widgets/loading_indicator.dart';
+import 'theme/theme_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,22 +29,8 @@ void main() async {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  // Track theme mode
-  ThemeMode _themeMode = ThemeMode.system;
-
-  void _changeTheme(ThemeMode mode) {
-    setState(() {
-      _themeMode = mode;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,75 +38,31 @@ class _MyAppState extends State<MyApp> {
       providers: [
         ChangeNotifierProvider(create: (_) => AuthService()),
         ChangeNotifierProvider(create: (_) => UserService()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Skill Exchange',
-        theme: _buildLightTheme(),
-        darkTheme: _buildDarkTheme(),
-        themeMode: _themeMode,
-        home: AuthWrapper(changeTheme: _changeTheme),
-        routes: {
-          '/login': (context) => LoginScreen(changeTheme: _changeTheme),
-          '/signup': (context) => SignupScreen(changeTheme: _changeTheme),
-          '/home': (context) => HomeScreen(changeTheme: _changeTheme),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'Skill Exchange',
+            theme: themeProvider.currentTheme,
+            home: const AuthWrapper(),
+            routes: {
+              '/login': (context) => const LoginScreen(),
+              '/signup': (context) => const SignupScreen(),
+              '/skill': (context) => const SkillScreen(), // ADD THIS ROUTE
+              '/interests': (context) => const InterestsScreen(), // ADD THIS ROUTE
+              '/home': (context) => const HomeScreen(),
+            },
+          );
         },
-        // ADD THIS to preserve navigation state during theme changes
-        navigatorKey: NavigatorKey.navigatorKey,
       ),
     );
   }
-
-  ThemeData _buildLightTheme() {
-    return ThemeData(
-      primarySwatch: Colors.blue,
-      useMaterial3: true,
-      brightness: Brightness.light,
-      colorScheme: ColorScheme.light(
-        primary: Color(0xFFFF6B6B),
-        secondary: Color(0xFF4ECDC4),
-        surface: Color(0xFFFFFFFF),
-        background: Color(0xFFF0F4FF),
-        onBackground: Color(0xFF374151),
-      ),
-      scaffoldBackgroundColor: Color(0xFFF0F4FF),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Color(0xFFFF6B6B),
-        foregroundColor: Colors.white,
-      ),
-    );
-  }
-
-  ThemeData _buildDarkTheme() {
-    return ThemeData(
-      primarySwatch: Colors.blue,
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      colorScheme: ColorScheme.dark(
-        primary: Color(0xFF8B5CF6),
-        secondary: Color(0xFF10B981),
-        surface: Color(0xFF1F2937),
-        background: Color(0xFF111827),
-        onBackground: Colors.white,
-      ),
-      scaffoldBackgroundColor: Color(0xFF111827),
-      appBarTheme: AppBarTheme(
-        backgroundColor: Color(0xFF1F2937),
-        foregroundColor: Colors.white,
-      ),
-    );
-  }
-}
-
-// ADD THIS CLASS to manage navigation state
-class NavigatorKey {
-  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 }
 
 class AuthWrapper extends StatelessWidget {
-  final Function(ThemeMode) changeTheme;
-
-  const AuthWrapper({super.key, required this.changeTheme});
+  const AuthWrapper({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -132,10 +78,10 @@ class AuthWrapper extends StatelessWidget {
         }
 
         if (snapshot.hasData && authService.isLoggedIn) {
-          return HomeScreen(changeTheme: changeTheme);
+          return const HomeScreen();
         }
 
-        return LoginScreen(changeTheme: changeTheme);
+        return const LoginScreen();
       },
     );
   }
