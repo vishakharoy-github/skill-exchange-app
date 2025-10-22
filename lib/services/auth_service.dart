@@ -28,7 +28,7 @@ class AuthService with ChangeNotifier {
         'name': name.trim(),
         'skills': [],
         'interests': [],
-        'bio': 'Enthusiastic IT Student',
+        'bio': '',
         'createdAt': ServerValue.timestamp,
         'profileImage': 'https://i.postimg.cc/wjlhzZ6c/vishakhaprofessionalphoto.jpg',
       });
