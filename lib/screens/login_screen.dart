@@ -8,9 +8,7 @@ import 'package:provider/provider.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  final Function(ThemeMode) changeTheme; // ADD THIS
-
-  const LoginScreen({super.key, required this.changeTheme}); // UPDATE THIS
+  const LoginScreen({super.key}); // REMOVE changeTheme parameter
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -63,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (context) => const AlertDialog(
         content: LoadingIndicator(message: 'Signing you in...'),
       ),
     );
@@ -267,7 +265,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                                   Navigator.push(
                                     context,
                                     PageRouteBuilder(
-                                      pageBuilder: (context, animation, secondaryAnimation) => SignupScreen(changeTheme: widget.changeTheme), // UPDATE THIS
+                                      pageBuilder: (context, animation, secondaryAnimation) => const SignupScreen(), // REMOVE changeTheme
                                       transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                         return SlideTransition(
                                           position: Tween<Offset>(

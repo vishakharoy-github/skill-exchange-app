@@ -5,6 +5,8 @@ import 'package:skill_exchange_app/models/user_model.dart' as app_model;
 import 'package:skill_exchange_app/services/user_service.dart';
 import 'package:skill_exchange_app/services/auth_service.dart';
 import 'package:skill_exchange_app/widgets/custom_button.dart';
+import 'package:skill_exchange_app/screens/edit_profile_screen.dart';
+import '../theme/theme_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -15,7 +17,6 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _aboutMeController = TextEditingController();
-  bool _isEditing = false;
   app_model.User? _currentUser;
   bool _isLoading = true;
   late AnimationController _animationController;
@@ -71,28 +72,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     }
   }
 
-  void _toggleEdit() {
-    setState(() {
-      _isEditing = !_isEditing;
-      if (!_isEditing && _currentUser != null) {
-        _saveBioChanges();
-      }
-    });
-  }
-
-  void _saveBioChanges() {
-    if (_currentUser == null) return;
-
-    final userService = Provider.of<UserService>(context, listen: false);
-    userService.updateUserBio(_currentUser!.id, _aboutMeController.text);
-
-    setState(() {
-      _currentUser = _currentUser!.copyWith(bio: _aboutMeController.text);
-    });
-  }
-
   Future<void> _showSignOutDialog() async {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+    final isDarkMode = themeProvider.isDarkMode;
 
     return showDialog(
       context: context,
@@ -115,10 +97,23 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.warning_amber_rounded,
-                  color: isDarkMode ? const Color(0xFFFFD93D) : const Color(0xFFFF6B6B),
-                  size: 60,
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: isDarkMode
+                        ? const LinearGradient(
+                      colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
+                    )
+                        : const LinearGradient(
+                      colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                    ),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.white,
+                    size: 40,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
@@ -127,7 +122,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     color: Colors.white,
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -137,7 +131,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 18,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 30),
@@ -154,14 +147,26 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: CustomButton(
-                        text: 'Sign Out',
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _signOut();
-                        },
-                        backgroundColor: Colors.white,
-                        textColor: isDarkMode ? const Color(0xFF6B21A8) : const Color(0xFFFF6B6B),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: isDarkMode
+                              ? const LinearGradient(
+                            colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
+                          )
+                              : const LinearGradient(
+                            colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+                          ),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: CustomButton(
+                          text: 'Sign Out',
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            _signOut();
+                          },
+                          backgroundColor: Colors.transparent,
+                          textColor: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -203,16 +208,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     }
   }
 
-  // Color scheme getters
+  // Enhanced color scheme getters with sparkling theme
   LinearGradient _getBackgroundGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFF0F0F23), Color(0xFF1A1A2E), Color(0xFF16213E)],
+      colors: [Color(0xFF0A0A0A), Color(0xFF1A1A1A), Color(0xFF2A1F0A)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
         : const LinearGradient(
-      colors: [Color(0xFFFFFBFF), Color(0xFFF0F4FF), Color(0xFFE6F0FF)],
+      colors: [Color(0xFFFAFDFF), Color(0xFFF0F4FF), Color(0xFFE6F0FF)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
@@ -221,7 +226,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getProfileHeaderGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFF6B21A8), Color(0xFF7C3AED), Color(0xFF8B5CF6)],
+      colors: [Color(0xFFFFD700), Color(0xFFFFA000), Color(0xFFFF8C00)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -235,7 +240,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getSkillsGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFF059669), Color(0xFF10B981), Color(0xFF34D399)],
+      colors: [Color(0xFF2A1F0A), Color(0xFF1A1406), Color(0xFF3D2E00)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -249,7 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getInterestsGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFFDC2626), Color(0xFFEF4444), Color(0xFFF87171)],
+      colors: [Color(0xFF2D1B4E), Color(0xFF1A1035), Color(0xFF4A148C)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -263,7 +268,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getAboutMeGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFFF59E0B), Color(0xFFD97706), Color(0xFFB45309)],
+      colors: [Color(0xFF1A0F33), Color(0xFF2D1B4E), Color(0xFF4A148C)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -277,7 +282,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getActionGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFF4F46E5), Color(0xFF7C3AED), Color(0xFF8B5CF6)],
+      colors: [Color(0xFFFFD700), Color(0xFFFFA000), Color(0xFFFF8C00)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -291,7 +296,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
   LinearGradient _getDialogGradient(bool isDarkMode) {
     return isDarkMode
         ? const LinearGradient(
-      colors: [Color(0xFF1E1B4B), Color(0xFF312E81), Color(0xFF4338CA)],
+      colors: [Color(0xFF2A1F0A), Color(0xFF1A1406), Color(0xFF3D2E00)],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     )
@@ -304,13 +309,13 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   Color _getSkillTagColor(bool isDarkMode, int index) {
     final darkColors = [
-      const Color(0xFF8B5CF6),
-      const Color(0xFFEC4899),
-      const Color(0xFF10B981),
-      const Color(0xFFF59E0B),
-      const Color(0xFFEF4444),
-      const Color(0xFF06B6D4),
-      const Color(0xFF84CC16),
+      const Color(0xFFFFD700),
+      const Color(0xFFFFA000),
+      const Color(0xFFFF69B4),
+      const Color(0xFF00FF00),
+      const Color(0xFF00BFFF),
+      const Color(0xFFFF1493),
+      const Color(0xFF32CD32),
     ];
     final lightColors = [
       const Color(0xFFFF6B6B),
@@ -326,7 +331,8 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+    final isDarkMode = themeProvider.isDarkMode;
 
     if (_isLoading || _currentUser == null) {
       return Scaffold(
@@ -343,18 +349,23 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 Text(
                   _isLoading ? 'Loading your profile...' : 'No user data found',
                   style: TextStyle(
-                    color: isDarkMode ? Colors.white : const Color(0xFF374151),
+                    color: isDarkMode ? Colors.amber : const Color(0xFF374151),
                     fontSize: 16,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 if (!_isLoading)
                   const SizedBox(height: 20),
-                CustomButton(
-                  text: 'Retry',
-                  onPressed: _loadCurrentUser,
-                  gradient: _getProfileHeaderGradient(isDarkMode),
-                  textColor: Colors.white,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: _getProfileHeaderGradient(isDarkMode),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: CustomButton(
+                    text: 'Retry',
+                    onPressed: _loadCurrentUser,
+                    backgroundColor: Colors.transparent,
+                    textColor: Colors.white,
+                  ),
                 ),
               ],
             ),
@@ -408,10 +419,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               borderRadius: BorderRadius.circular(32),
               boxShadow: [
                 BoxShadow(
-                  color: isDarkMode ? const Color(0xFF6B21A8).withOpacity(0.4) : const Color(0xFFFF6B6B).withOpacity(0.4),
+                  color: isDarkMode
+                      ? const Color(0xFFFFD700).withOpacity(0.4)
+                      : const Color(0xFFFF6B6B).withOpacity(0.4),
                   blurRadius: 25,
                   offset: const Offset(0, 8),
                 ),
+                if (isDarkMode)
+                  BoxShadow(
+                    color: Colors.white.withOpacity(0.2),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                  ),
               ],
             ),
             child: Column(
@@ -437,6 +456,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                             blurRadius: 20,
                             offset: const Offset(0, 6),
                           ),
+                          if (isDarkMode)
+                            BoxShadow(
+                              color: Colors.amber.withOpacity(0.4),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
                         ],
                       ),
                       child: Lottie.asset(
@@ -472,16 +497,15 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 // Name
                 Text(
                   _currentUser!.name,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.white,
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
                     shadows: [
                       Shadow(
                         blurRadius: 12,
-                        color: Colors.black26,
-                        offset: Offset(2, 2),
+                        color: Colors.black.withOpacity(0.3),
+                        offset: const Offset(2, 2),
                       ),
                     ],
                   ),
@@ -494,7 +518,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     color: Colors.white.withOpacity(0.9),
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -504,7 +527,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.8),
                     fontSize: 14,
-                    fontFamily: 'Poppins',
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -534,6 +556,14 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             color: Colors.white.withOpacity(0.2),
             shape: BoxShape.circle,
             border: Border.all(color: Colors.white.withOpacity(0.5), width: 2),
+            boxShadow: [
+              if (isDarkMode)
+                BoxShadow(
+                  color: Colors.amber.withOpacity(0.3),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+            ],
           ),
           child: Text(
             value,
@@ -541,7 +571,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
               color: Colors.white,
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Poppins',
             ),
           ),
         ),
@@ -552,7 +581,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             color: Colors.white.withOpacity(0.9),
             fontSize: 12,
             fontWeight: FontWeight.w500,
-            fontFamily: 'Poppins',
           ),
         ),
       ],
@@ -569,10 +597,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? const Color(0xFF059669).withOpacity(0.4) : const Color(0xFF00B4D8).withOpacity(0.4),
+            color: isDarkMode
+                ? const Color(0xFFFFD700).withOpacity(0.3)
+                : const Color(0xFF00B4D8).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
+          if (isDarkMode)
+            BoxShadow(
+              color: Colors.white.withOpacity(0.1),
+              blurRadius: 10,
+              spreadRadius: 1,
+            ),
         ],
       ),
       child: Column(
@@ -586,16 +622,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 26),
+                child: Icon(Icons.rocket_launch_rounded,
+                    color: isDarkMode ? Colors.amber : Colors.white, size: 26),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'My Skills',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
                 ),
               ),
               const Spacer(),
@@ -610,7 +646,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
                   ),
                 ),
               ),
@@ -635,6 +670,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),
+                    if (isDarkMode)
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.2),
+                        blurRadius: 5,
+                        spreadRadius: 1,
+                      ),
                   ],
                 ),
                 child: Row(
@@ -648,7 +689,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                         color: Colors.white,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        fontFamily: 'Poppins',
                       ),
                     ),
                   ],
@@ -671,10 +711,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? const Color(0xFFDC2626).withOpacity(0.4) : const Color(0xFF8B5CF6).withOpacity(0.4),
+            color: isDarkMode
+                ? const Color(0xFF7B1FA2).withOpacity(0.4)
+                : const Color(0xFF8B5CF6).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
+          if (isDarkMode)
+            BoxShadow(
+              color: Colors.purple.withOpacity(0.3),
+              blurRadius: 15,
+              spreadRadius: 1,
+            ),
         ],
       ),
       child: Column(
@@ -688,16 +736,16 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 26),
+                child: Icon(Icons.auto_awesome_rounded,
+                    color: isDarkMode ? Colors.purple.shade300 : Colors.white, size: 26),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'My Interests',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
                 ),
               ),
             ],
@@ -721,6 +769,12 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                       blurRadius: 10,
                       offset: const Offset(0, 5),
                     ),
+                    if (isDarkMode)
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.2),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
                   ],
                 ),
                 child: Text(
@@ -729,7 +783,6 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                     color: Colors.white,
                     fontWeight: FontWeight.w700,
                     fontSize: 15,
-                    fontFamily: 'Poppins',
                     shadows: [
                       Shadow(
                         blurRadius: 3,
@@ -756,10 +809,18 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: isDarkMode ? const Color(0xFFF59E0B).withOpacity(0.4) : const Color(0xFFEC4899).withOpacity(0.4),
+            color: isDarkMode
+                ? const Color(0xFF7B1FA2).withOpacity(0.4)
+                : const Color(0xFFEC4899).withOpacity(0.4),
             blurRadius: 20,
             offset: const Offset(0, 6),
           ),
+          if (isDarkMode)
+            BoxShadow(
+              color: Colors.purple.withOpacity(0.3),
+              blurRadius: 15,
+              spreadRadius: 1,
+            ),
         ],
       ),
       child: Column(
@@ -773,45 +834,27 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                   color: Colors.white.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.psychology_rounded, color: Colors.white, size: 26),
+                child: Icon(Icons.psychology_rounded,
+                    color: isDarkMode ? Colors.purple.shade300 : Colors.white, size: 26),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'About Me',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          _isEditing
-              ? TextField(
-            controller: _aboutMeController,
-            maxLines: 4,
-            decoration: InputDecoration(
-              hintText: 'Tell the world about your amazing self...',
-              hintStyle: TextStyle(color: Colors.white.withOpacity(0.7), fontFamily: 'Poppins'),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              filled: true,
-              fillColor: Colors.white.withOpacity(0.2),
-              contentPadding: const EdgeInsets.all(20),
-            ),
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontFamily: 'Poppins'),
-          )
-              : Text(
-            _aboutMeController.text.isNotEmpty ? _aboutMeController.text : 'I\'m an enthusiastic IT student ready to conquer the world! 🚀',
+          Text(
+            _aboutMeController.text.isNotEmpty ? _aboutMeController.text : 'No bio added yet.',
             style: TextStyle(
               fontSize: 16,
               color: Colors.white.withOpacity(0.95),
               height: 1.6,
-              fontFamily: 'Poppins',
             ),
           ),
         ],
@@ -823,11 +866,33 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
     return Row(
       children: [
         Expanded(
-          child: CustomButton(
-            text: _isEditing ? 'Save Changes' : 'Edit Profile',
-            onPressed: _toggleEdit,
-            gradient: _getActionGradient(isDarkMode),
-            textColor: Colors.white,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: _getActionGradient(isDarkMode),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: isDarkMode
+                      ? const Color(0xFFFFD700).withOpacity(0.4)
+                      : const Color(0xFFFF6B6B).withOpacity(0.4),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: CustomButton(
+              text: 'Edit Profile',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfileScreen(currentUser: _currentUser!),
+                  ),
+                );
+              },
+              backgroundColor: Colors.transparent,
+              textColor: Colors.white,
+            ),
           ),
         ),
         const SizedBox(width: 16),
@@ -838,7 +903,9 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
             borderRadius: BorderRadius.circular(18),
             boxShadow: [
               BoxShadow(
-                color: isDarkMode ? const Color(0xFFDC2626).withOpacity(0.4) : const Color(0xFF8B5CF6).withOpacity(0.4),
+                color: isDarkMode
+                    ? const Color(0xFF7B1FA2).withOpacity(0.4)
+                    : const Color(0xFF8B5CF6).withOpacity(0.4),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -857,7 +924,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: isDarkMode
-              ? [const Color(0xFF374151), const Color(0xFF4B5563)]
+              ? [const Color(0xFF1A1A1A), const Color(0xFF2D2D2D)]
               : [const Color(0xFF6B7280), const Color(0xFF9CA3AF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -884,23 +951,34 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
                 child: const Icon(Icons.power_settings_new_rounded, color: Colors.white, size: 26),
               ),
               const SizedBox(width: 12),
-              const Text(
+              Text(
                 'Account',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  fontFamily: 'Poppins',
                 ),
               ),
             ],
           ),
           const SizedBox(height: 20),
-          CustomButton(
-            text: 'Sign Out',
-            onPressed: _showSignOutDialog,
-            backgroundColor: Colors.white,
-            textColor: isDarkMode ? const Color(0xFF374151) : const Color(0xFF6B7280),
+          Container(
+            decoration: BoxDecoration(
+              gradient: isDarkMode
+                  ? const LinearGradient(
+                colors: [Color(0xFFFFD700), Color(0xFFFFA000)],
+              )
+                  : const LinearGradient(
+                colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)],
+              ),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: CustomButton(
+              text: 'Sign Out',
+              onPressed: _showSignOutDialog,
+              backgroundColor: Colors.transparent,
+              textColor: Colors.white,
+            ),
           ),
         ],
       ),

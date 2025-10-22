@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:skill_exchange_app/screens/login_screen.dart';
-import 'package:skill_exchange_app/screens/interests_screen.dart';
+import 'package:skill_exchange_app/screens/skill_screen.dart'; // ADD THIS IMPORT
 import 'package:skill_exchange_app/services/auth_service.dart';
 import 'package:skill_exchange_app/widgets/custom_button.dart';
 import 'package:skill_exchange_app/widgets/custom_textfield.dart';
@@ -10,12 +10,59 @@ import 'package:skill_exchange_app/widgets/success_animation.dart';
 import 'package:provider/provider.dart';
 
 class SignupScreen extends StatefulWidget {
-  final Function(ThemeMode) changeTheme;
-
-  const SignupScreen({super.key, required this.changeTheme});
+  const SignupScreen({super.key});
 
   @override
   State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _RegistrationSuccessScreen extends StatelessWidget {
+  final VoidCallback onAnimationComplete;
+
+  const _RegistrationSuccessScreen({required this.onAnimationComplete});
+
+  @override
+  Widget build(BuildContext context) {
+    Future.delayed(const Duration(seconds: 3), onAnimationComplete);
+
+    return Scaffold(
+      backgroundColor: Colors.green.shade50,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Lottie.asset(
+              'assets/animations/success_checkmark.json',
+              width: 150,
+              height: 150,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(height: 30),
+            Text(
+              'Account Created!',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.green.shade800,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Redirecting to skills selection...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey.shade600,
+              ),
+            ),
+            const SizedBox(height: 30),
+            const CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.green),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderStateMixin {
@@ -106,34 +153,31 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
       ScaffoldMessenger.of(currentContext).showSnackBar(
         SnackBar(content: Text('Signup failed: ${e.toString()}')),
       );
-    }
 
-    if (mounted) {
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
   void _showRegistrationSuccess() {
     if (!mounted) return;
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AlertDialog(
-        content: SuccessAnimation(message: 'Account Created!'),
-      ),
-    );
-
-    Future.delayed(const Duration(seconds: 2), () {
-      if (!mounted) return;
-      Navigator.pop(context); // Close success dialog
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => InterestsScreen(changeTheme: widget.changeTheme),
+    // Navigate directly to a success screen that will auto-redirect to SkillScreen
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => _RegistrationSuccessScreen(
+          onAnimationComplete: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              // CHANGE THIS: Navigate to SkillScreen instead of InterestsScreen
+              MaterialPageRoute(builder: (context) => const SkillScreen()),
+                  (route) => false,
+            );
+          },
         ),
-      );
-    });
+      ),
+          (route) => false,
+    );
   }
 
   @override
@@ -314,7 +358,7 @@ class _SignupScreenState extends State<SignupScreen> with SingleTickerProviderSt
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => LoginScreen(changeTheme: widget.changeTheme), // FIXED: Add changeTheme
+                                    builder: (context) => const LoginScreen(),
                                   ),
                                 );
                               },

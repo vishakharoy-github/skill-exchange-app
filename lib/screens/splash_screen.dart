@@ -3,9 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:skill_exchange_app/screens/login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
-  final Function(ThemeMode) changeTheme; // ADD THIS
-
-  const SplashScreen({super.key, required this.changeTheme}); // UPDATE THIS
+  const SplashScreen({super.key}); // REMOVE changeTheme parameter
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -24,7 +22,7 @@ class _SplashScreenState extends State<SplashScreen> {
         Navigator.pushReplacement(
           currentContext,
           MaterialPageRoute(
-            builder: (context) => LoginScreen(changeTheme: widget.changeTheme), // FIXED: Add changeTheme
+            builder: (context) => const LoginScreen(), // REMOVE changeTheme
           ),
         );
       }
