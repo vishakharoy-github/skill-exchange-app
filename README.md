@@ -19,3 +19,22 @@ Real-time Notifications: Stay updated on matches and messages
 Skill Verification: Optional skill verification through community endorsements
 
 Exchange Tracking: Keep records of completed skill swaps
+
+💡 Use Cases
+For Individuals
+Learn new hobbies (photography, cooking, coding)
+
+Exchange professional skills (design, marketing, development)
+
+Practice languages with native speakers
+
+Share creative talents (music, art, writing)
+
+For Communities
+Corporate skill-sharing programs
+
+University student exchanges
+
+Neighborhood knowledge sharing
+
+Professional development networks
